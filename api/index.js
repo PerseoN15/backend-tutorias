@@ -13,9 +13,10 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  origin: "https://frontend-tutorias-3f42.vercel.app", // Reemplaza con tu dominio exacto de Vercel
+  origin: 'https://frontend-tutorias-3f42.vercel.app', // Tu dominio exacto de Vercel
   credentials: true,
 };
+
 
 app.use(cors(corsOptions));
 
