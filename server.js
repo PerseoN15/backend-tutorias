@@ -12,11 +12,14 @@ import verificarToken from './middlewares/verificarToken.js';
 dotenv.config();
 const app = express();
 
-// ✅ Configurar CORS para permitir frontend en Vercel
 app.use(cors({
-  origin: 'https://frontend-tutorias.vercel.app',
+  origin: [
+    'https://frontend-tutorias.vercel.app',
+    'https://frontend-tutorias-3f42.vercel.app'
+  ],
   credentials: true
 }));
+
 
 app.use(express.json());
 
