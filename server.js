@@ -12,15 +12,19 @@ import verificarToken from './middlewares/verificarToken.js';
 dotenv.config();
 const app = express();
 
+// ✅ Configurar CORS para Vercel con soporte para preflight (OPTIONS)
 app.use(cors({
   origin: [
     'https://frontend-tutorias.vercel.app',
     'https://frontend-tutorias-3f42.vercel.app'
   ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-
+// ✅ Soporte explícito para solicitudes OPTIONS
+app.options('*', cors());
 
 app.use(express.json());
 
