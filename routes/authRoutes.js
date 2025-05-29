@@ -26,15 +26,11 @@ router.get('/exists/:id', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al verificar usuario', error });
   }
 });
-router.get('/exists/:nombre', async (req, res) => {
-  try {
-    const { nombre } = req.params;
-    const usuario = await Usuario.findOne({ nombre });
-    res.json({ exists: !!usuario });
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al verificar usuario', error });
-  }
-});
+
+export const checkUsernameExists = async (nombre) => {
+  const response = await API.get(`/auth/exists/usuario/${nombre}`);
+  return response.data.existe;
+};
 
 
 export default router;
