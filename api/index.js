@@ -26,5 +26,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', verificarToken, usuarioRoutes);
 app.use('/api/materias', verificarToken, materiaRoutes);
 app.use('/api/alumnos', verificarToken, alumnoRoutes);
+app.get("/", (req, res) => {
+  res.send("API de tutorías funcionando correctamente.");
+});
+
 
 export default app;
