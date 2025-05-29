@@ -12,11 +12,13 @@ import verificarToken from '../middlewares/verificarToken.js';
 dotenv.config();
 const app = express();
 
-app.use(cors({
-  origin: '*',
-  credentials: true
-}));
-app.use(express.json());
+const corsOptions = {
+  origin: "https://frontend-tutorias-3f42.vercel.app", // Reemplaza con tu dominio exacto de Vercel
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a MongoDB Atlas'))
