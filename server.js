@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
@@ -12,19 +11,19 @@ import verificarToken from './middlewares/verificarToken.js';
 dotenv.config();
 const app = express();
 
-// ✅ CORS debe ir antes de todo
-const corsOptions = {
-  origin: [
-    'https://frontend-tutorias.vercel.app',
-    'https://frontend-tutorias-3f42.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Soporte preflight
+// ✅ Middleware CORS manual
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://frontend-tutorias-3f42.vercel.app');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200); // Responder sin bloquear
+  }
+  
+  next();
+});
 
 app.use(express.json());
 
@@ -43,4 +42,4 @@ app.use('/api/alumnos', verificarToken, alumnoRoutes);
 
 // Puerto
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
+app.listen(PORT, () => console.log(` Servidor en puerto ${PORT}`));
