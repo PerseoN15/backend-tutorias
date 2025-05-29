@@ -11,35 +11,42 @@ import verificarToken from './middlewares/verificarToken.js';
 dotenv.config();
 const app = express();
 
-// ✅ Middleware CORS manual
+// ✅ Middleware CORS manual para Clever Cloud
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://frontend-tutorias-3f42.vercel.app');
+  const allowedOrigins = [
+    'https://frontend-tutorias-3f42.vercel.app',
+    'https://frontend-tutorias.vercel.app'
+  ];
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  
+
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200); // Responder sin bloquear
+    return res.sendStatus(204); // 👈 Importante: responde a preflight
   }
-  
+
   next();
 });
 
 app.use(express.json());
 
-// 🔌 Conexión a MongoDB Atlas
+// 🔌 MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a MongoDB'))
-  .catch((err) => console.error('❌ Error de conexión:', err));
+  .catch(err => console.error('❌ Error de conexión:', err));
 
-// Rutas públicas
+// Rutas
 app.use('/api/auth', authRoutes);
-
-// Rutas protegidas
 app.use('/api/usuarios', verificarToken, usuarioRoutes);
 app.use('/api/materias', verificarToken, materiaRoutes);
 app.use('/api/alumnos', verificarToken, alumnoRoutes);
 
 // Puerto
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(` Servidor en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
