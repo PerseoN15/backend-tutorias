@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import fetch from 'node-fetch';
 import Usuario from '../models/Usuario.js';
-
 
 export const registrarUsuario = async (req, res) => {
   try {
@@ -28,22 +28,36 @@ export const registrarUsuario = async (req, res) => {
   }
 };
 
-
 export const loginUsuario = async (req, res) => {
   try {
-    const { nombre, contraseña } = req.body;
+    const { nombre, contraseña, captchaToken } = req.body;
 
-    if (!nombre || !contraseña) {
-      return res.status(400).json({ message: 'Nombre y contraseña obligatorios' });
+   
+    if (!nombre || !contraseña || !captchaToken) {
+      return res.status(400).json({ message: 'Faltan datos obligatorios' });
     }
 
+    const secretKey = process.env.RECAPTCHA_SECRET;
+    const captchaRes = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `secret=${secretKey}&response=${captchaToken}`
+    });
+
+    const captchaData = await captchaRes.json();
+
+    if (!captchaData.success) {
+      return res.status(400).json({ message: 'Captcha inválido' });
+    }
+
+  
     const usuario = await Usuario.findOne({ nombre });
     if (!usuario) return res.status(400).json({ message: 'Usuario no encontrado' });
 
     const esValida = await bcrypt.compare(contraseña, usuario.contraseña);
     if (!esValida) return res.status(401).json({ message: 'Contraseña incorrecta' });
 
-    // 🔐 Firmar token JWT
+
     const token = jwt.sign(
       { id: usuario._id, nombre: usuario.nombre },
       process.env.JWT_SECRET,
