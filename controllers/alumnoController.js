@@ -44,7 +44,7 @@ export const crearAlumno = async (req, res) => {
 };
 
 
-// ✅ Consulta general
+// Consulta general
 export const obtenerAlumnos = async (req, res) => {
   try {
     const alumnos = await Alumno.find().populate('materiasAsignadas.materiaId');
@@ -54,7 +54,7 @@ export const obtenerAlumnos = async (req, res) => {
   }
 };
 
-// ✅ Consulta específica
+// Consulta específica
 export const obtenerAlumnoPorId = async (req, res) => {
   try {
     const alumno = await Alumno.findById(req.params.id).populate('materiasAsignadas.materiaId');
@@ -65,7 +65,7 @@ export const obtenerAlumnoPorId = async (req, res) => {
   }
 };
 
-// ✅ Cambios (actualizar alumno)
+// Cambios (actualizar alumno)
 export const actualizarAlumno = async (req, res) => {
   try {
     const actualizado = await Alumno.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -76,7 +76,7 @@ export const actualizarAlumno = async (req, res) => {
   }
 };
 
-// ✅ Baja (eliminar alumno)
+// Baja (eliminar alumno)
 export const eliminarAlumno = async (req, res) => {
   try {
     const eliminado = await Alumno.findByIdAndDelete(req.params.id);
@@ -87,7 +87,7 @@ export const eliminarAlumno = async (req, res) => {
   }
 };
 
-// ✅ Asignar materias a un alumno
+// Asignar materias a un alumno
 export const asignarMaterias = async (req, res) => {
   try {
     const { materias } = req.body;
@@ -110,14 +110,23 @@ export const asignarMaterias = async (req, res) => {
       });
     }
 
-    alumno.materiasAsignadas = materias.map(m => ({
-      materiaId: m.materiaId,
-      calificacion: m.calificacion ?? 0
-    }));
+    // Obtener IDs actuales
+    const materiasActuales = alumno.materiasAsignadas.map(m => m.materiaId.toString());
+
+    // Agregar nuevas sin eliminar las existentes
+    materias.forEach(m => {
+      if (!materiasActuales.includes(m.materiaId)) {
+        alumno.materiasAsignadas.push({
+          materiaId: m.materiaId,
+          calificacion: m.calificacion ?? 0
+        });
+      }
+    });
 
     await alumno.save();
 
     res.json({ message: 'Materias asignadas correctamente', alumno });
+
   } catch (error) {
     res.status(500).json({
       message: 'Error al asignar materias al alumno',
@@ -126,7 +135,8 @@ export const asignarMaterias = async (req, res) => {
   }
 };
 
-// ✅ Registrar calificaciones y evaluar estatus
+
+// Registrar calificaciones y evaluar estatus
 export const registrarCalificaciones = async (req, res) => {
   try {
     const { calificaciones } = req.body;
