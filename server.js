@@ -21,6 +21,7 @@ app.use(cors({
 }));
 
 
+
 app.use(express.json());
 
 // 🔌 Conexión a MongoDB Atlas

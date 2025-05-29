@@ -26,6 +26,15 @@ router.get('/exists/:id', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al verificar usuario', error });
   }
 });
+router.get('/exists/:nombre', async (req, res) => {
+  try {
+    const { nombre } = req.params;
+    const usuario = await Usuario.findOne({ nombre });
+    res.json({ exists: !!usuario });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al verificar usuario', error });
+  }
+});
 
 
 export default router;
