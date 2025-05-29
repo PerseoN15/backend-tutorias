@@ -12,8 +12,8 @@ import verificarToken from './middlewares/verificarToken.js';
 dotenv.config();
 const app = express();
 
-// ✅ Configurar CORS para Vercel con soporte para preflight (OPTIONS)
-app.use(cors({
+// ✅ CORS debe ir antes de todo
+const corsOptions = {
   origin: [
     'https://frontend-tutorias.vercel.app',
     'https://frontend-tutorias-3f42.vercel.app'
@@ -21,17 +21,17 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
-}));
+};
 
-// ✅ Soporte explícito para solicitudes OPTIONS
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Soporte preflight
 
 app.use(express.json());
 
 // 🔌 Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Conectado a MongoDB'))
-  .catch((err) => console.error('Error de conexión:', err));
+  .then(() => console.log('✅ Conectado a MongoDB'))
+  .catch((err) => console.error('❌ Error de conexión:', err));
 
 // Rutas públicas
 app.use('/api/auth', authRoutes);
@@ -43,4 +43,4 @@ app.use('/api/alumnos', verificarToken, alumnoRoutes);
 
 // Puerto
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
